@@ -13,12 +13,21 @@ Records a per-epoch solvency attestation for a token issuer.
 | `submit_attestation(epoch, proof, root, total_liabilities, fiat_reserves, fiat_sig)` | verifies the ZK proof, checks the fiat-reserve signature, reads on-chain reserves, records `solvent = reserves >= liabilities` |
 | `get_attestation(epoch)` / `latest()` / `is_solvent(epoch)` | read the registry |
 
-### What is implemented vs pending
+### What is implemented
 
-- Implemented and testable now: registry storage, on-chain reserve read (`TokenClient::balance`),
-  signed fiat-reserve attestation (`ed25519_verify`), solvency comparison, events, getters.
-- Pending (Day 4): `groth16::verify` BN254 pairing check. It currently traps on purpose rather
-  than returning a misleading result. See `src/groth16.rs` and `docs/DESIGN.md`.
+- BN254 Groth16 verification (`src/groth16.rs`): MSM for `vk_x` plus a 4-term pairing-product
+  check, using Stellar's P25/P26 host functions. Verified end to end with a real depth-2 proof
+  both in unit tests (against the real host crypto) and live on testnet.
+- Registry storage, on-chain reserve read (`TokenClient::balance`), signed fiat-reserve
+  attestation (`ed25519_verify`), solvency comparison, events, getters.
+- `verify_proof(vk, proof, public_inputs)`: a stateless, reusable on-chain Groth16 verifier.
+
+### Live on testnet
+
+- Contract: `CDEGNQIHKDYXE7PNV6SHJ6OENSVDPLUEL5KS7TDHTJQIAQBBJMT4U5QS`
+- Real proof verifies (on-chain tx): https://stellar.expert/explorer/testnet/tx/94573ab6e3c3cf8768c6553fc8b819ead12fe13170e2168b86d56426c9ab4c58
+- Reproduce: `bash ../circuits/scripts/verify_testnet.sh` (real proof returns `true`, tampered
+  input returns `false`).
 
 ### Public signal layout
 

@@ -38,7 +38,60 @@ fn double_init_fails() {
     assert_eq!(again, Err(Ok(Error::AlreadyInitialized)));
 }
 
-// PENDING: end-to-end submit_attestation tests need the Groth16 verifier wired
-// (Day 4) and a Stellar Asset Contract reserve token for the balance read (Day 5).
-// At that point assert: valid proof + solvent reserves -> solvent = true; drained
-// reserves -> solvent = false; tampered total -> InvalidProof.
+use crate::fixtures;
+use crate::groth16::{self, Proof, VerifyingKey};
+use soroban_sdk::{vec, Vec};
+
+fn bytesn<const N: usize>(env: &Env, a: &[u8; N]) -> BytesN<N> {
+    BytesN::from_array(env, a)
+}
+
+fn make_vk(env: &Env) -> VerifyingKey {
+    let mut ic = Vec::new(env);
+    for p in fixtures::IC.iter() {
+        ic.push_back(bytesn(env, p));
+    }
+    VerifyingKey {
+        alpha: bytesn(env, &fixtures::ALPHA),
+        beta: bytesn(env, &fixtures::BETA),
+        gamma: bytesn(env, &fixtures::GAMMA),
+        delta: bytesn(env, &fixtures::DELTA),
+        ic,
+    }
+}
+
+fn make_proof(env: &Env) -> Proof {
+    Proof {
+        a: bytesn(env, &fixtures::PROOF_A),
+        b: bytesn(env, &fixtures::PROOF_B),
+        c: bytesn(env, &fixtures::PROOF_C),
+    }
+}
+
+#[test]
+fn groth16_accepts_valid_proof() {
+    let env = Env::default();
+    let id = env.register(AttestarContract, ());
+    let vk = make_vk(&env);
+    let proof = make_proof(&env);
+    let pubs = vec![
+        &env,
+        bytesn(&env, &fixtures::PUB[0]),
+        bytesn(&env, &fixtures::PUB[1]),
+    ];
+    let ok = env.as_contract(&id, || groth16::verify(&env, &vk, &proof, &pubs));
+    assert!(ok, "valid Groth16 proof should verify");
+}
+
+#[test]
+fn groth16_rejects_tampered_public_input() {
+    let env = Env::default();
+    let id = env.register(AttestarContract, ());
+    let vk = make_vk(&env);
+    let proof = make_proof(&env);
+    let mut bad_total = fixtures::PUB[1];
+    bad_total[31] ^= 1;
+    let pubs = vec![&env, bytesn(&env, &fixtures::PUB[0]), bytesn(&env, &bad_total)];
+    let ok = env.as_contract(&id, || groth16::verify(&env, &vk, &proof, &pubs));
+    assert!(!ok, "tampered public input must be rejected");
+}

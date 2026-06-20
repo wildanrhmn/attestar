@@ -62,9 +62,16 @@ auditor.
 
 ## Status
 
-Pre-build scaffold. ZK is load-bearing by construction. The Groth16 verification call inside the
-contract is the one piece pending end-to-end wiring (tracked as Day 4 in the design doc); the
-attestation registry, reserve reads, and signed fiat-attestation path are implemented.
+On-chain ZK verification works. A real Groth16 proof is verified inside the Soroban contract on
+Stellar testnet ([on-chain tx](https://stellar.expert/explorer/testnet/tx/94573ab6e3c3cf8768c6553fc8b819ead12fe13170e2168b86d56426c9ab4c58)),
+and a tampered input is correctly rejected. The SDK and circuit produce identical Merkle-sum
+roots (proven by `packages/circuits/scripts/lockstep.mjs`). The attestation registry, reserve
+reads, and signed fiat-attestation path are implemented.
+
+Remaining for the demo: end-to-end `submit_attestation` flow with a reserve token, the web app
+(issuer / holder / auditor), and the demo video.
+
+- Testnet contract: `CDEGNQIHKDYXE7PNV6SHJ6OENSVDPLUEL5KS7TDHTJQIAQBBJMT4U5QS`
 
 ## License
 

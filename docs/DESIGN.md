@@ -8,8 +8,9 @@ Name: **Attestar** (attestation + the Stellar star motif). Project folder:
 `D:\Programming\hacks\attestar`. Tagline: "Continuous, provable solvency."
 
 Last updated: 2026-06-20
-Status: monorepo scaffolded; toolchain installing in WSL; ZK core circuit + SDK + contract
-written; Groth16 on-chain verification is the one piece pending wiring (Day 4).
+Status: ZK pipeline working end to end. SDK-circuit lockstep proven; Groth16 proof verified
+on-chain on Stellar testnet (real tx) and tampered input rejected. Remaining: end-to-end
+submit_attestation flow with a reserve token, the web app, and the demo video.
 
 ### Repo state (2026-06-20, scaffold)
 - `packages/circuits`: Circom `SolvencyTree(DEPTH, BITS)` (Merkle-sum tree, Poseidon, per-leaf
@@ -39,15 +40,26 @@ written; Groth16 on-chain verification is the one piece pending wiring (Day 4).
   Extrapolated depth-10 ~ 1.4M constraints (needs ptau power 21, large). For the demo, prefer a
   modest depth (6 to 8) unless we optimize the node hash. Revisit before the depth-10 main build.
 
+- 2026-06-20 (Day 4 DONE, the critical path): `groth16::verify` wired with the real BN254 host
+  functions (MSM for vk_x + 4-term pairing-product check, A negated on-chain via the SDK Neg).
+  Encoding confirmed: G1 = be(X)||be(Y); G2 = be(X.c1)||be(X.c0)||be(Y.c1)||be(Y.c0)
+  (imaginary-first); snarkjs G2 is [c0,c1] per coord, so we swap. Public signal order [root,total].
+  - Unit tests pass against the real host crypto (valid -> true, tampered -> false).
+  - Deployed to testnet: contract `CDEGNQIHKDYXE7PNV6SHJ6OENSVDPLUEL5KS7TDHTJQIAQBBJMT4U5QS`,
+    deployer identity `deployer` (funded via friendbot).
+  - Live on-chain: real proof returns true (tx
+    https://stellar.expert/explorer/testnet/tx/94573ab6e3c3cf8768c6553fc8b819ead12fe13170e2168b86d56426c9ab4c58),
+    tampered input returns false. Reproduce: `bash packages/circuits/scripts/verify_testnet.sh`.
+  - Added stateless `verify_proof(vk, proof, public_inputs)` contract fn (reusable verifier).
+- WSL shell gotcha: bare `VAR=...` assignments and `$(...)` capture get mangled through
+  `wsl bash -lc '...'` from the tool layer. Put logic in a script FILE on /mnt/d and run that.
+  Also WSL `/tmp` is wiped on distro restart between calls; write intermediate files under /mnt/d.
+
 ### Next actions when resuming
-1. Day 4 (the critical path): wire `groth16::verify` in the contract (BN254 MSM for vk_x via P26
-   host fn + pairing-product check via P25 host fn). Import the snarkjs vkey into the contract,
-   deploy to testnet, verify the real depth-2 proof on-chain. The off-chain proof + vkey already
-   exist in `packages/circuits/build/solvency_test/`.
-2. Decide demo tree depth (6 to 8) and build that circuit + run a real multi-party-ish setup.
-3. Day 5: SAC reserve token in tests + end-to-end submit_attestation tests (solvent / drained /
-   tampered-total). Wire the signed fiat-attestation oracle.
-4. Day 6+: web app (issuer dashboard, holder inclusion check, auditor view), then the demo flow
+1. Decide demo tree depth (6 to 8) and build that circuit (its own vkey + setup).
+2. Day 5: SAC reserve token in tests + end-to-end `submit_attestation` tests (solvent / drained /
+   tampered-total). Exercise the signed fiat-attestation oracle path.
+3. Day 6+: web app (issuer dashboard, holder inclusion check, auditor view), then the demo flow
    (the "issuer tries to lie, proof fails" beat) and the video.
 
 ---

@@ -129,6 +129,15 @@ impl AttestarContract {
             .map(|a| a.solvent)
             .unwrap_or(false)
     }
+
+    pub fn verify_proof(
+        env: Env,
+        vk: VerifyingKey,
+        proof: Proof,
+        public_inputs: Vec<BytesN<32>>,
+    ) -> bool {
+        groth16::verify(&env, &vk, &proof, &public_inputs)
+    }
 }
 
 impl AttestarContract {
@@ -201,5 +210,7 @@ impl AttestarContract {
     }
 }
 
+#[cfg(test)]
+mod fixtures;
 #[cfg(test)]
 mod test;
