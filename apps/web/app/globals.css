@@ -1,10 +1,80 @@
 @import "tailwindcss";
 
+@theme {
+  --color-ink: #0a0b0d;
+  --color-ink-raised: #121317;
+  --color-ink-soft: #15171c;
+  --color-bone: #ece7da;
+  --color-bone-dim: #9b978c;
+  --color-slate: #6b6f76;
+  --color-brass: #c8a86a;
+  --color-brass-dim: #87723f;
+  --color-proven: #46c68a;
+  --color-failed: #e5564b;
+  --color-line: rgba(236, 231, 218, 0.09);
+
+  --font-display: var(--font-fraunces), serif;
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
 :root {
   color-scheme: dark;
 }
 
+html {
+  -webkit-font-smoothing: antialiased;
+}
+
 body {
-  background: #0a0a0a;
-  color: #fafafa;
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgba(200, 168, 106, 0.06), transparent 60%),
+    var(--color-ink);
+  color: var(--color-bone);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: rgba(200, 168, 106, 0.25);
+}
+
+@keyframes seal-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes seal-draw {
+  from {
+    stroke-dashoffset: var(--dash, 1000);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+.hairline {
+  border-color: var(--color-line);
+}
+
+.rise {
+  animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
