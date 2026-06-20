@@ -115,6 +115,32 @@ fn solvent_when_reserves_cover_liabilities() {
     assert_eq!(h.client.latest(), Some(att));
 }
 
+#[test]
+fn insolvent_when_reserves_below_liabilities() {
+    let env = Env::default();
+    let h = deploy_with_reserves(&env);
+    h.token_admin.mint(&h.reserve_holder, &5_000);
+
+    let att = submit(&h, 1, FIXTURE_TOTAL, 0);
+
+    assert!(!att.solvent);
+    assert!(!h.client.is_solvent(&1));
+}
+
+#[test]
+fn fiat_reserves_count_toward_solvency() {
+    let env = Env::default();
+    let h = deploy_with_reserves(&env);
+    h.token_admin.mint(&h.reserve_holder, &5_000);
+
+    // on-chain 5000 alone is short; a signed fiat attestation of 5000 tips it solvent.
+    let att = submit(&h, 1, FIXTURE_TOTAL, 5_000);
+
+    assert!(att.solvent);
+    assert_eq!(att.onchain_reserves, 5_000);
+    assert_eq!(att.fiat_reserves, 5_000);
+}
+
 fn bytesn<const N: usize>(env: &Env, a: &[u8; N]) -> BytesN<N> {
     BytesN::from_array(env, a)
 }
