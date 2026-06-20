@@ -141,6 +141,40 @@ fn fiat_reserves_count_toward_solvency() {
     assert_eq!(att.fiat_reserves, 5_000);
 }
 
+#[test]
+fn rejects_proof_with_mismatched_total() {
+    let env = Env::default();
+    let h = deploy_with_reserves(&env);
+    h.token_admin.mint(&h.reserve_holder, &12_000);
+
+    let proof = make_proof(&env);
+    let root = bytesn(&env, &fixtures::PUB[0]);
+    let sig = BytesN::from_array(&env, &fiat_signature(&h.sk, 1, 0));
+    // claimed total (9999) does not match the total the proof commits to (9500)
+    let res = h
+        .client
+        .try_submit_attestation(&1, &proof, &root, &9_999u128, &0u128, &sig);
+
+    assert_eq!(res, Err(Ok(Error::InvalidProof)));
+}
+
+#[test]
+fn rejects_duplicate_epoch() {
+    let env = Env::default();
+    let h = deploy_with_reserves(&env);
+    h.token_admin.mint(&h.reserve_holder, &12_000);
+    submit(&h, 1, FIXTURE_TOTAL, 0);
+
+    let proof = make_proof(&env);
+    let root = bytesn(&env, &fixtures::PUB[0]);
+    let sig = BytesN::from_array(&env, &fiat_signature(&h.sk, 1, 0));
+    let res = h
+        .client
+        .try_submit_attestation(&1, &proof, &root, &FIXTURE_TOTAL, &0u128, &sig);
+
+    assert_eq!(res, Err(Ok(Error::EpochExists)));
+}
+
 fn bytesn<const N: usize>(env: &Env, a: &[u8; N]) -> BytesN<N> {
     BytesN::from_array(env, a)
 }
