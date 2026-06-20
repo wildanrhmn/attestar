@@ -26,14 +26,29 @@ written; Groth16 on-chain verification is the one piece pending wiring (Day 4).
   `~/attestar-toolchain-install.log`.
 - GitHub remote: https://github.com/wildanrhmn/attestar.git (branch master).
 
+### Progress log
+- 2026-06-20 (Day 1-2 done): toolchain installed in WSL (rustc 1.96, circom 2.2.3,
+  stellar-cli 27.0.0 from prebuilt binary; cargo-built stellar-cli failed on libdbus, so we use
+  the GitHub release binary at `~/.cargo/bin/stellar`). soroban-sdk pinned to `27.0.0-rc.1`.
+  Contract builds to wasm (5.8KB, 6 exports) and `cargo test` passes (2 tests). Circuit compiles
+  (depth-2 = 4539 constraints). **SDK-circuit lockstep PROVEN**: identical Merkle-sum root,
+  Groth16 proof verifies, inclusion proof verifies (`scripts/lockstep.mjs`).
+- ptau: hermez S3 mirror returns 403; use the `storage.googleapis.com/zkevm/ptau` mirror, with
+  local generation fallback in `scripts/ptau.sh`.
+- Constraint cost note: Poseidon(4) internal nodes are ~1100 constraints each. depth-2 = 4539.
+  Extrapolated depth-10 ~ 1.4M constraints (needs ptau power 21, large). For the demo, prefer a
+  modest depth (6 to 8) unless we optimize the node hash. Revisit before the depth-10 main build.
+
 ### Next actions when resuming
-1. Confirm WSL toolchain finished (`stellar --version`, `circom --version`, `cargo --version`).
-2. Confirm/adjust `soroban-sdk` version in `packages/contracts/Cargo.toml` to the installed protocol.
-3. `cargo test` the contract (registry/getter tests should pass without a proof).
-4. `pnpm install`; build the depth-2 test circuit end to end (ptau 12), generate a proof with the
-   SDK witness, verify with snarkjs locally. This validates SDK-circuit lockstep.
-5. Day 4: wire `groth16::verify` (BN254 MSM + pairing check), import the vkey, verify a real proof
-   on testnet.
+1. Day 4 (the critical path): wire `groth16::verify` in the contract (BN254 MSM for vk_x via P26
+   host fn + pairing-product check via P25 host fn). Import the snarkjs vkey into the contract,
+   deploy to testnet, verify the real depth-2 proof on-chain. The off-chain proof + vkey already
+   exist in `packages/circuits/build/solvency_test/`.
+2. Decide demo tree depth (6 to 8) and build that circuit + run a real multi-party-ish setup.
+3. Day 5: SAC reserve token in tests + end-to-end submit_attestation tests (solvent / drained /
+   tampered-total). Wire the signed fiat-attestation oracle.
+4. Day 6+: web app (issuer dashboard, holder inclusion check, auditor view), then the demo flow
+   (the "issuer tries to lie, proof fails" beat) and the video.
 
 ---
 

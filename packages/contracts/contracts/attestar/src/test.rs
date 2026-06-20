@@ -3,7 +3,7 @@
 use super::*;
 use soroban_sdk::{testutils::Address as _, Address, BytesN, Env};
 
-fn setup(env: &Env) -> (AttestarContractClient, Address) {
+fn setup(env: &Env) -> (AttestarContractClient<'_>, Address) {
     let contract_id = env.register(AttestarContract, ());
     let client = AttestarContractClient::new(env, &contract_id);
     let admin = Address::generate(env);

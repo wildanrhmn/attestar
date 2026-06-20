@@ -4,7 +4,7 @@ mod groth16;
 pub use groth16::{Proof, VerifyingKey};
 
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, symbol_short, token, Address, Bytes,
+    contract, contracterror, contractevent, contractimpl, contracttype, token, Address, Bytes,
     BytesN, Env, Vec,
 };
 
@@ -31,7 +31,7 @@ pub enum DataKey {
 }
 
 #[contracttype]
-#[derive(Clone)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Attestation {
     pub epoch: u64,
     pub root: BytesN<32>,
@@ -40,6 +40,16 @@ pub struct Attestation {
     pub fiat_reserves: u128,
     pub solvent: bool,
     pub timestamp: u64,
+}
+
+#[contractevent]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct AttestationPosted {
+    #[topic]
+    pub epoch: u64,
+    pub solvent: bool,
+    pub total_liabilities: u128,
+    pub onchain_reserves: i128,
 }
 
 #[contract]
@@ -180,10 +190,13 @@ impl AttestarContract {
             .set(&DataKey::Attestation(epoch), &att);
         env.storage().instance().set(&DataKey::LatestEpoch, &epoch);
 
-        env.events().publish(
-            (symbol_short!("attest"), epoch),
-            (att.solvent, att.total_liabilities, att.onchain_reserves),
-        );
+        AttestationPosted {
+            epoch,
+            solvent: att.solvent,
+            total_liabilities: att.total_liabilities,
+            onchain_reserves: att.onchain_reserves,
+        }
+        .publish(env);
         att
     }
 }
