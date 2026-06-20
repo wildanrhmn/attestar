@@ -71,16 +71,24 @@ submit_attestation flow with a reserve token, the web app, and the demo video.
   `CB2FQBKA4UGJ3VSNRYDD6IAMOKJ7IVBZH5SOT3BAZCPTIPRJYBEUCCI6`. The whole backend product is proven
   on-chain; the web app is now a UI over a working system.
 
-### Next actions when resuming
-1. Web app (issuer-side proving is the natural architecture: the issuer's backend builds the tree
-   and proves over all balances; a Next.js API route does proving + submit via stellar-sdk with
-   the issuer key. Holder inclusion check is lightweight and can run client-side).
-   - For the on-chain demo, deploy a simple mint-friendly demo token (a small mock stablecoin
-     contract avoids classic-asset trustline friction that a raw SAC hits on testnet).
-2. The demo flow: publish a solvent attestation (green) -> drain reserves -> next epoch flips to
-   INSOLVENT (the FTX/Zondacrypto beat). Then holder inclusion check + auditor view.
-3. Build the demo tree depth (6 to 8) circuit + its vkey for the web demo.
-4. Demo video + final README polish.
+- 2026-06-20 (WEB APP DONE): full Next.js 15 demo app live on testnet, browser-tested end to end.
+  Design: Tailwind v4 @theme (ink/bone/brass/proven/failed), Fraunces + Geist + Geist Mono. The
+  signature element is the live "Solvency Seal" (brass ring, flips green SOLVENT / red INSOLVENT).
+  Architecture: server actions do issuer-side proving (snarkjs over the depth-4 solvency_demo
+  circuit) + encode + submit via the generated attestar-client/mock-token-client bindings, signed
+  with the issuer key (basicNodeSigner). Reviewed against the Web Interface Guidelines (focus-visible,
+  aria-live, theme-color, numeric inputs). Verified the full beat in-browser: publish -> SOLVENT,
+  drain -> reserves drop, publish -> INSOLVENT (real testnet txs), plus holder inclusion check.
+  - Stable web demo deployment (from `setup_web_demo.sh`, depth-4 vkey set):
+    attestar `CBM5K5RIAH4QIDMULKU6K7RFQP5ZEEOZM5O46QHMNJNAT6A4LQP55QOC`,
+    token `CALXJ4SGBXJQRLHZSDDKFXDT2ZGSMSCW5KDPJ5R4BS4BULG7LHP6WMUU`. Config in apps/web/.env.local
+    (gitignored: holds the issuer secret). Dev server on port 3100 (3000 is the Excalidraw canvas).
+  - serverExternalPackages in next.config keeps snarkjs/circomlibjs/stellar-sdk out of the bundle.
+
+### What remains
+- Record the 2-3 min demo video (script at docs/DEMO_SCRIPT.md).
+- Optional polish: auditor selective-disclosure view, more holders in the demo, copy pass.
+- The submission is otherwise complete: open-source repo, working ZK-on-Stellar, clear README.
 
 ---
 
