@@ -50,10 +50,32 @@ auditor.
 | Path | What |
 | --- | --- |
 | `packages/circuits` | Circom solvency circuit (the ZK core) and proving scripts |
-| `packages/sdk` | TypeScript merkle-sum tree + witness builder (kept in lockstep with the circuit) |
-| `packages/contracts` | Soroban verifier + attestation registry contract (Rust) |
-| `apps/web` | Next.js app: issuer dashboard, holder inclusion check, auditor view |
+| `packages/sdk` | TypeScript merkle-sum tree, witness builder, and proof encoding (kept in lockstep with the circuit) |
+| `packages/contracts` | Soroban verifier + attestation registry contract, and a demo token (Rust) |
+| `packages/attestar-client` | Generated TypeScript bindings for the Attestar contract |
+| `packages/mock-token-client` | Generated TypeScript bindings for the demo token |
+| `apps/web` | Next.js app: live solvency seal, holder ledger, and on-chain publish / drain actions |
 | `docs/DESIGN.md` | Master design doc |
+
+## Live demo
+
+The web app drives the real contract on Stellar testnet. Publish an attestation (the proof is
+generated from the holder ledger and verified on-chain), then drain the reserves and watch the next
+attestation flip to insolvent. Every button is a real transaction.
+
+Run it:
+
+```bash
+pnpm install
+# build the circuit + proving artifacts (depth-4 demo)
+pnpm --filter @attestar/sdk build
+cd packages/circuits && npm install && bash scripts/ptau.sh 15 && bash scripts/build.sh solvency_demo && cd -
+# deploy + configure a fresh testnet deployment, writes apps/web/.env.local
+#   (needs a funded `deployer` identity: stellar keys generate deployer --network testnet --fund)
+bash packages/contracts/scripts/setup_web_demo.sh
+# run the app
+pnpm web:dev   # http://localhost:3100
+```
 
 ## Toolchain
 
