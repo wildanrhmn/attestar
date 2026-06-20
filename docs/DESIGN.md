@@ -55,12 +55,23 @@ submit_attestation flow with a reserve token, the web app, and the demo video.
   `wsl bash -lc '...'` from the tool layer. Put logic in a script FILE on /mnt/d and run that.
   Also WSL `/tmp` is wiped on distro restart between calls; write intermediate files under /mnt/d.
 
+- 2026-06-20 (full attestation flow DONE): end-to-end `submit_attestation` tested with a real
+  Stellar Asset Contract reserve token (`register_stellar_asset_contract_v2`) and a real ed25519
+  signed fiat attestation (ed25519-dalek in dev-deps). 10 tests pass: solvent, insolvent, fiat
+  oracle tips solvency, fiat-sig skipped when fiat=0, mismatched-total -> InvalidProof, duplicate
+  epoch -> EpochExists, plus the groth16 + init tests. Design change: fiat signature only required
+  when `fiat_reserves > 0` (pure on-chain reserves are trustless).
+
 ### Next actions when resuming
-1. Decide demo tree depth (6 to 8) and build that circuit (its own vkey + setup).
-2. Day 5: SAC reserve token in tests + end-to-end `submit_attestation` tests (solvent / drained /
-   tampered-total). Exercise the signed fiat-attestation oracle path.
-3. Day 6+: web app (issuer dashboard, holder inclusion check, auditor view), then the demo flow
-   (the "issuer tries to lie, proof fails" beat) and the video.
+1. Web app (issuer-side proving is the natural architecture: the issuer's backend builds the tree
+   and proves over all balances; a Next.js API route does proving + submit via stellar-sdk with
+   the issuer key. Holder inclusion check is lightweight and can run client-side).
+   - For the on-chain demo, deploy a simple mint-friendly demo token (a small mock stablecoin
+     contract avoids classic-asset trustline friction that a raw SAC hits on testnet).
+2. The demo flow: publish a solvent attestation (green) -> drain reserves -> next epoch flips to
+   INSOLVENT (the FTX/Zondacrypto beat). Then holder inclusion check + auditor view.
+3. Build the demo tree depth (6 to 8) circuit + its vkey for the web demo.
+4. Demo video + final README polish.
 
 ---
 
