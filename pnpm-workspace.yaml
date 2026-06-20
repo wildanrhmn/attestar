@@ -1,4 +1,6 @@
 packages:
   - packages/circuits
   - packages/sdk
+  - packages/attestar-client
+  - packages/mock-token-client
   - apps/web
