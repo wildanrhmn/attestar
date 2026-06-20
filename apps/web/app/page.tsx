@@ -54,7 +54,7 @@ export default async function Home() {
       <section className="grid items-center gap-10 py-16 md:grid-cols-[1.1fr_auto] md:py-24">
         <div className="flex flex-col gap-6 rise">
           <Eyebrow>Zero-knowledge proof of reserves · Stellar</Eyebrow>
-          <h1 className="font-display text-5xl leading-[1.05] tracking-tight md:text-6xl">
+          <h1 className="text-balance font-display text-5xl leading-[1.05] tracking-tight md:text-6xl">
             Solvency you can <span className="italic text-brass">verify</span>, not just trust.
           </h1>
           <p className="max-w-xl text-lg leading-relaxed text-bone-dim">
@@ -75,7 +75,7 @@ export default async function Home() {
           <div className="pt-2">
             <a
               href="#demo"
-              className="inline-flex items-center gap-2 rounded-full bg-bone px-5 py-2.5 text-sm font-medium text-neutral-950 transition hover:bg-white"
+              className="inline-flex items-center gap-2 rounded-full bg-bone px-5 py-2.5 text-sm font-medium text-neutral-950 transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/60"
             >
               Run the live demo
             </a>

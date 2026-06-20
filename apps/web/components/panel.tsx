@@ -3,16 +3,15 @@ import { cn } from "@/lib/cn";
 export function Panel({
   children,
   className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
+  ...rest
+}: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={cn(
         "rounded-2xl border border-line bg-ink-raised/60 backdrop-blur-sm",
         className,
       )}
+      {...rest}
     >
       {children}
     </div>

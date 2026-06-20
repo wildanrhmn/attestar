@@ -104,13 +104,17 @@ export function Console({
                 <input
                   value={h.userId}
                   onChange={(e) => setHolder(i, "userId", e.target.value)}
-                  className="w-16 bg-transparent font-mono text-sm text-bone-dim outline-none"
+                  inputMode="numeric"
+                  spellCheck={false}
+                  className="w-16 rounded bg-transparent px-1 font-mono text-sm text-bone-dim outline-none focus-visible:ring-1 focus-visible:ring-brass/50"
                   aria-label={`Holder ${i + 1} id`}
                 />
                 <input
                   value={h.balance}
                   onChange={(e) => setHolder(i, "balance", e.target.value)}
-                  className="flex-1 bg-transparent text-right font-mono text-sm tabular-nums outline-none"
+                  inputMode="numeric"
+                  spellCheck={false}
+                  className="flex-1 rounded bg-transparent px-1 text-right font-mono text-sm tabular-nums outline-none focus-visible:ring-1 focus-visible:ring-brass/50"
                   aria-label={`Holder ${i + 1} balance`}
                 />
                 <button
@@ -157,7 +161,9 @@ export function Console({
             <input
               value={drainAmount}
               onChange={(e) => setDrainAmount(e.target.value)}
-              className="w-full rounded-lg border border-line bg-ink px-3 py-2 text-right font-mono text-sm tabular-nums outline-none focus:border-brass/40"
+              inputMode="numeric"
+              spellCheck={false}
+              className="w-full rounded-lg border border-line bg-ink px-3 py-2 text-right font-mono text-sm tabular-nums outline-none focus-visible:border-brass/50 focus-visible:ring-1 focus-visible:ring-brass/30"
               aria-label="Drain amount"
             />
             <button
@@ -181,7 +187,7 @@ export function Console({
       <button
         onClick={() => run("Attestation published", () => publishAttestation(holders))}
         disabled={pending}
-        className="w-full rounded-xl bg-bone py-4 text-sm font-medium text-neutral-950 transition hover:bg-white disabled:opacity-50"
+        className="w-full rounded-xl bg-bone py-4 text-sm font-medium text-neutral-950 transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/60 disabled:opacity-50"
       >
         {pending && stage === "Attestation published"
           ? "Generating proof and submitting on-chain…"
@@ -189,7 +195,7 @@ export function Console({
       </button>
 
       {(tx || error || pending) && (
-        <Panel className="px-5 py-4">
+        <Panel className="px-5 py-4" aria-live="polite">
           {pending && <p className="font-mono text-sm text-bone-dim">{stage}…</p>}
           {error && !pending && <p className="font-mono text-sm text-failed">{error}</p>}
           {tx && !pending && (
