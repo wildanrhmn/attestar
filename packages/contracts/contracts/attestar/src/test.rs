@@ -142,6 +142,22 @@ fn fiat_reserves_count_toward_solvency() {
 }
 
 #[test]
+fn no_fiat_signature_required_when_fiat_is_zero() {
+    let env = Env::default();
+    let h = deploy_with_reserves(&env);
+    h.token_admin.mint(&h.reserve_holder, &12_000);
+
+    let proof = make_proof(&env);
+    let root = bytesn(&env, &fixtures::PUB[0]);
+    let garbage_sig = BytesN::from_array(&env, &[0u8; 64]);
+    let att = h
+        .client
+        .submit_attestation(&1, &proof, &root, &FIXTURE_TOTAL, &0u128, &garbage_sig);
+
+    assert!(att.solvent);
+}
+
+#[test]
 fn rejects_proof_with_mismatched_total() {
     let env = Env::default();
     let h = deploy_with_reserves(&env);

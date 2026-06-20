@@ -109,7 +109,11 @@ impl AttestarContract {
             return Err(Error::InvalidProof);
         }
 
-        Self::verify_fiat(&env, epoch, fiat_reserves, &fiat_sig);
+        // A signed attestation is only required when the issuer claims off-chain fiat
+        // reserves. Pure on-chain reserves are trustless and need no oracle.
+        if fiat_reserves > 0 {
+            Self::verify_fiat(&env, epoch, fiat_reserves, &fiat_sig);
+        }
 
         let att = Self::record(&env, epoch, root, total_liabilities, fiat_reserves);
         Ok(att)
