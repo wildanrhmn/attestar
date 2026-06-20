@@ -62,6 +62,15 @@ submit_attestation flow with a reserve token, the web app, and the demo video.
   epoch -> EpochExists, plus the groth16 + init tests. Design change: fiat signature only required
   when `fiat_reserves > 0` (pure on-chain reserves are trustless).
 
+- 2026-06-20 (FULL ON-CHAIN DEMO WORKING): `packages/contracts/scripts/demo_testnet.sh` runs the
+  whole flow on testnet. Epoch 1 reserves 12000 >= liabilities 9500 -> AttestationPosted{solvent:
+  true}; issuer drains 6000; epoch 2 reserves 6000 < 9500 -> AttestationPosted{solvent: false}.
+  This is the FTX/Zondacrypto beat live on-chain (ZK verify + reserve read + solvency flip).
+  Demo deployment (re-run script to refresh): token
+  `CB5IWYQ6VABQ7TSGQKMEC7F3BR3HOS5TO3O44J4CK75QAJXMO3PY5MMO`, attestar
+  `CB2FQBKA4UGJ3VSNRYDD6IAMOKJ7IVBZH5SOT3BAZCPTIPRJYBEUCCI6`. The whole backend product is proven
+  on-chain; the web app is now a UI over a working system.
+
 ### Next actions when resuming
 1. Web app (issuer-side proving is the natural architecture: the issuer's backend builds the tree
    and proves over all balances; a Next.js API route does proving + submit via stellar-sdk with
