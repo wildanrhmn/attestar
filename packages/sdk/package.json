@@ -1,0 +1,26 @@
+{
+  "name": "@attestar/sdk",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Merkle-sum tree, witness builder, and inclusion proofs for Attestar. Kept in lockstep with the Circom circuit.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch"
+  },
+  "dependencies": {
+    "circomlibjs": "^0.1.7"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "@types/node": "^22.9.0"
+  }
+}

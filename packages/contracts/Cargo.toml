@@ -1,0 +1,18 @@
+[workspace]
+resolver = "2"
+members = ["contracts/*"]
+
+[workspace.dependencies]
+# NOTE: align this with the installed protocol (P25/P26 expose the BN254 + Poseidon
+# host functions Attestar's verifier needs). Confirm the exact published version with
+# `cargo search soroban-sdk` on Day 1 and bump if needed.
+soroban-sdk = "22.0.0"
+
+[profile.release]
+opt-level = "z"
+overflow-checks = true
+debug = 0
+strip = "symbols"
+codegen-units = 1
+lto = true
+panic = "abort"

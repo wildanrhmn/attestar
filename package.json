@@ -1,0 +1,14 @@
+{
+  "name": "attestar",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Continuous on-chain zero-knowledge proof-of-reserves-and-liabilities for stablecoin and RWA issuers on Stellar.",
+  "packageManager": "pnpm@10.10.0",
+  "scripts": {
+    "build:sdk": "pnpm --filter @attestar/sdk build",
+    "circuits:build": "pnpm --filter @attestar/circuits build",
+    "web:dev": "pnpm --filter @attestar/web dev",
+    "contracts:build": "stellar contract build --manifest-path packages/contracts/Cargo.toml"
+  },
+  "license": "MIT"
+}
