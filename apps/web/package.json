@@ -3,24 +3,25 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3100",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
     "@attestar/sdk": "workspace:*",
+    "@creit.tech/stellar-wallets-kit": "^2.3.0",
     "@phosphor-icons/react": "^2.1.7",
     "@stellar/stellar-sdk": "^14.5.0",
     "attestar-client": "workspace:*",
     "clsx": "^2.1.1",
     "mock-token-client": "workspace:*",
-    "tailwind-merge": "^2.5.4",
     "next": "^15.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "server-only": "^0.0.1",
-    "snarkjs": "^0.7.5"
+    "snarkjs": "^0.7.5",
+    "tailwind-merge": "^2.5.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.0.0",

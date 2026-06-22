@@ -21,3 +21,29 @@ export function explorerTx(hash: string): string {
 export function explorerContract(id: string): string {
   return `${EXPLORER}/contract/${id}`;
 }
+
+const USDC_DECIMALS = Number(process.env.NEXT_PUBLIC_USDC_DECIMALS ?? "7");
+
+export function usdcToBase(v: string): bigint {
+  const [whole, frac = ""] = (v || "0").trim().split(".");
+  const fracPadded = (frac + "0".repeat(USDC_DECIMALS)).slice(0, USDC_DECIMALS);
+  const w = whole.replace(/[^0-9]/g, "") || "0";
+  const f = fracPadded.replace(/[^0-9]/g, "") || "0";
+  return BigInt(w) * 10n ** BigInt(USDC_DECIMALS) + BigInt(f);
+}
+
+export function baseToUsdc(v: string | bigint | null | undefined): string {
+  if (v === null || v === undefined) return "—";
+  let b: bigint;
+  try {
+    b = BigInt(v);
+  } catch {
+    return String(v);
+  }
+  const neg = b < 0n;
+  if (neg) b = -b;
+  const base = 10n ** BigInt(USDC_DECIMALS);
+  const whole = b / base;
+  const frac = (b % base).toString().padStart(USDC_DECIMALS, "0").replace(/0+$/, "");
+  return `${neg ? "-" : ""}${whole.toLocaleString("en-US")}${frac ? "." + frac : ""}`;
+}
