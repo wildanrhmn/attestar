@@ -34,10 +34,9 @@ pub enum DataKey {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Attestation {
     pub epoch: u64,
-    pub root: BytesN<32>,
-    pub total_liabilities: u128,
+    pub liab_root: BytesN<32>,
+    pub res_root: BytesN<32>,
     pub onchain_reserves: i128,
-    pub fiat_reserves: u128,
     pub solvent: bool,
     pub timestamp: u64,
 }
@@ -48,7 +47,6 @@ pub struct AttestationPosted {
     #[topic]
     pub epoch: u64,
     pub solvent: bool,
-    pub total_liabilities: u128,
     pub onchain_reserves: i128,
 }
 
@@ -82,14 +80,25 @@ impl AttestarContract {
         Ok(())
     }
 
+    // Records a private proof of solvency for `epoch`.
+    //
+    // `liab_root` and `res_root` are the Merkle-sum commitments to the (private)
+    // holder liabilities and the (private) off-chain reserve sources. `solvent` is
+    // the verdict computed inside the circuit. The contract reads the issuer's REAL
+    // on-chain reserve balance and substitutes it as the fourth public input, so the
+    // prover cannot inflate it: the four public signals
+    //   [liab_root, res_root, solvent, onchain_reserves]
+    // must match the proof exactly or verification fails. When an attestor is set,
+    // a custodian ed25519 signature over (epoch || res_root) attests the off-chain
+    // reserve composition.
     pub fn submit_attestation(
         env: Env,
         epoch: u64,
         proof: Proof,
-        root: BytesN<32>,
-        total_liabilities: u128,
-        fiat_reserves: u128,
-        fiat_sig: BytesN<64>,
+        liab_root: BytesN<32>,
+        res_root: BytesN<32>,
+        solvent: bool,
+        res_sig: BytesN<64>,
     ) -> Result<Attestation, Error> {
         let admin = Self::admin(&env)?;
         admin.require_auth();
@@ -104,18 +113,16 @@ impl AttestarContract {
             .get(&DataKey::Vk)
             .ok_or(Error::VerifierNotSet)?;
 
-        let public_inputs = Self::public_inputs(&env, &root, total_liabilities);
+        let onchain_reserves = Self::reserves(&env);
+        let public_inputs =
+            Self::public_inputs(&env, &liab_root, &res_root, solvent, onchain_reserves);
         if !groth16::verify(&env, &vk, &proof, &public_inputs) {
             return Err(Error::InvalidProof);
         }
 
-        // A signed attestation is only required when the issuer claims off-chain fiat
-        // reserves. Pure on-chain reserves are trustless and need no oracle.
-        if fiat_reserves > 0 {
-            Self::verify_fiat(&env, epoch, fiat_reserves, &fiat_sig);
-        }
+        Self::verify_reserve_sig(&env, epoch, &res_root, &res_sig);
 
-        let att = Self::record(&env, epoch, root, total_liabilities, fiat_reserves);
+        let att = Self::record(&env, epoch, liab_root, res_root, onchain_reserves, solvent);
         Ok(att)
     }
 
@@ -152,48 +159,70 @@ impl AttestarContract {
             .ok_or(Error::NotInitialized)
     }
 
-    fn public_inputs(env: &Env, root: &BytesN<32>, total: u128) -> Vec<BytesN<32>> {
-        let mut total_be = [0u8; 32];
-        total_be[16..].copy_from_slice(&total.to_be_bytes());
+    fn reserves(env: &Env) -> i128 {
+        let reserve_token: Address = env.storage().instance().get(&DataKey::ReserveToken).unwrap();
+        let reserve_holder: Address =
+            env.storage().instance().get(&DataKey::ReserveHolder).unwrap();
+        token::TokenClient::new(env, &reserve_token).balance(&reserve_holder)
+    }
+
+    fn public_inputs(
+        env: &Env,
+        liab_root: &BytesN<32>,
+        res_root: &BytesN<32>,
+        solvent: bool,
+        onchain_reserves: i128,
+    ) -> Vec<BytesN<32>> {
         let mut inputs = Vec::new(env);
-        inputs.push_back(root.clone());
-        inputs.push_back(BytesN::from_array(env, &total_be));
+        inputs.push_back(liab_root.clone());
+        inputs.push_back(res_root.clone());
+        inputs.push_back(Self::bool_field(env, solvent));
+        inputs.push_back(Self::u128_field(env, onchain_reserves as u128));
         inputs
     }
 
-    fn verify_fiat(env: &Env, epoch: u64, fiat_reserves: u128, sig: &BytesN<64>) {
+    fn bool_field(env: &Env, b: bool) -> BytesN<32> {
+        let mut be = [0u8; 32];
+        if b {
+            be[31] = 1;
+        }
+        BytesN::from_array(env, &be)
+    }
+
+    fn u128_field(env: &Env, v: u128) -> BytesN<32> {
+        let mut be = [0u8; 32];
+        be[16..].copy_from_slice(&v.to_be_bytes());
+        BytesN::from_array(env, &be)
+    }
+
+    fn verify_reserve_sig(env: &Env, epoch: u64, res_root: &BytesN<32>, sig: &BytesN<64>) {
         let attestor: BytesN<32> = env
             .storage()
             .instance()
             .get(&DataKey::Attestor)
             .expect("attestor not set");
+        if attestor == BytesN::from_array(env, &[0u8; 32]) {
+            return;
+        }
         let mut msg = Bytes::new(env);
         msg.extend_from_slice(&epoch.to_be_bytes());
-        msg.extend_from_slice(&fiat_reserves.to_be_bytes());
+        msg.extend_from_slice(&res_root.to_array());
         env.crypto().ed25519_verify(&attestor, &msg, sig);
     }
 
     fn record(
         env: &Env,
         epoch: u64,
-        root: BytesN<32>,
-        total_liabilities: u128,
-        fiat_reserves: u128,
+        liab_root: BytesN<32>,
+        res_root: BytesN<32>,
+        onchain_reserves: i128,
+        solvent: bool,
     ) -> Attestation {
-        let reserve_token: Address = env.storage().instance().get(&DataKey::ReserveToken).unwrap();
-        let reserve_holder: Address =
-            env.storage().instance().get(&DataKey::ReserveHolder).unwrap();
-        let onchain_reserves = token::TokenClient::new(env, &reserve_token).balance(&reserve_holder);
-
-        let total_reserves = (onchain_reserves as i128).saturating_add(fiat_reserves as i128);
-        let solvent = total_reserves >= total_liabilities as i128;
-
         let att = Attestation {
             epoch,
-            root,
-            total_liabilities,
+            liab_root,
+            res_root,
             onchain_reserves,
-            fiat_reserves,
             solvent,
             timestamp: env.ledger().timestamp(),
         };
@@ -206,7 +235,6 @@ impl AttestarContract {
         AttestationPosted {
             epoch,
             solvent: att.solvent,
-            total_liabilities: att.total_liabilities,
             onchain_reserves: att.onchain_reserves,
         }
         .publish(env);

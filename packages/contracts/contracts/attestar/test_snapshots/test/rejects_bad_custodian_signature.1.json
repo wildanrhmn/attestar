@@ -125,66 +125,6 @@
         }
       ]
     ],
-    [
-      [
-        "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD2KM",
-        {
-          "function": {
-            "contract_fn": {
-              "contract_address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4",
-              "function_name": "submit_attestation",
-              "args": [
-                {
-                  "u64": "1"
-                },
-                {
-                  "map": [
-                    {
-                      "key": {
-                        "symbol": "a"
-                      },
-                      "val": {
-                        "bytes": "15352d551e2f584c327ee1a1bc931a70915176150c29d134c1b6cf39f4d09f5829ea9b7cf405025bb1e7e8bbf77c0db6617cb1f687370155fc96ef92e83dece5"
-                      }
-                    },
-                    {
-                      "key": {
-                        "symbol": "b"
-                      },
-                      "val": {
-                        "bytes": "10fcca3b19a5581442b5a4ff6dd907ee231e15400b470f606caad0fbefde556d03c3004068508f8c99ecd06deefa5e05de6f9b875ee4b76729d2844df14742e81e27809c12cf3b855796383e63de5839dadbb9f987bb73ef89a135f0e238356d10ab8182b62e1282830e3704c8ae666a13886ce1fcedff4192903eab89e30f8f"
-                      }
-                    },
-                    {
-                      "key": {
-                        "symbol": "c"
-                      },
-                      "val": {
-                        "bytes": "2bf257bd60e2a3646fba055183400f5c6bca226556bbbb831db92f3cab62df970c625880ecc9c42ca3b8337828df527108e54aa8148fde212b314ea38731af06"
-                      }
-                    }
-                  ]
-                },
-                {
-                  "bytes": "0062d547dafb19649eaf44663a8e5c162a4fd11027af60443cafacaf6f5b56ee"
-                },
-                {
-                  "bytes": "299da752eb363df9f9b711c23f63820c22643bfcb2dd064f8cf6072332104295"
-                },
-                {
-                  "bool": true
-                },
-                {
-                  "bytes": "863998c2ebb88b05c5b103d2b01e3342d53f56900af51bf29717149d711ff65bb3141ef7a2d55acf4250eb10e818ca59207c02b833a8fcff4a0025ead65fa30e"
-                }
-              ]
-            }
-          },
-          "sub_invocations": []
-        }
-      ]
-    ],
-    [],
     []
   ],
   "ledger": {
@@ -267,26 +207,6 @@
               "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD2KM",
               "key": {
                 "ledger_key_nonce": {
-                  "nonce": "4837995959683129791"
-                }
-              },
-              "durability": "temporary",
-              "val": "void"
-            }
-          },
-          "ext": "v0"
-        },
-        "live_until": 6311999
-      },
-      {
-        "entry": {
-          "last_modified_ledger_seq": 0,
-          "data": {
-            "contract_data": {
-              "ext": "v0",
-              "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD2KM",
-              "key": {
-                "ledger_key_nonce": {
                   "nonce": "5541220902715666415"
                 }
               },
@@ -297,82 +217,6 @@
           "ext": "v0"
         },
         "live_until": 6311999
-      },
-      {
-        "entry": {
-          "last_modified_ledger_seq": 0,
-          "data": {
-            "contract_data": {
-              "ext": "v0",
-              "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4",
-              "key": {
-                "vec": [
-                  {
-                    "symbol": "Attestation"
-                  },
-                  {
-                    "u64": "1"
-                  }
-                ]
-              },
-              "durability": "persistent",
-              "val": {
-                "map": [
-                  {
-                    "key": {
-                      "symbol": "epoch"
-                    },
-                    "val": {
-                      "u64": "1"
-                    }
-                  },
-                  {
-                    "key": {
-                      "symbol": "liab_root"
-                    },
-                    "val": {
-                      "bytes": "0062d547dafb19649eaf44663a8e5c162a4fd11027af60443cafacaf6f5b56ee"
-                    }
-                  },
-                  {
-                    "key": {
-                      "symbol": "onchain_reserves"
-                    },
-                    "val": {
-                      "i128": "5000"
-                    }
-                  },
-                  {
-                    "key": {
-                      "symbol": "res_root"
-                    },
-                    "val": {
-                      "bytes": "299da752eb363df9f9b711c23f63820c22643bfcb2dd064f8cf6072332104295"
-                    }
-                  },
-                  {
-                    "key": {
-                      "symbol": "solvent"
-                    },
-                    "val": {
-                      "bool": true
-                    }
-                  },
-                  {
-                    "key": {
-                      "symbol": "timestamp"
-                    },
-                    "val": {
-                      "u64": "0"
-                    }
-                  }
-                ]
-              }
-            }
-          },
-          "ext": "v0"
-        },
-        "live_until": 4095
       },
       {
         "entry": {
@@ -411,18 +255,6 @@
                       },
                       "val": {
                         "bytes": "fd1724385aa0c75b64fb78cd602fa1d991fdebf76b13c58ed702eac835e9f618"
-                      }
-                    },
-                    {
-                      "key": {
-                        "vec": [
-                          {
-                            "symbol": "LatestEpoch"
-                          }
-                        ]
-                      },
-                      "val": {
-                        "u64": "1"
                       }
                     },
                     {
