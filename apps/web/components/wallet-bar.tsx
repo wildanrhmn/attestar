@@ -4,6 +4,7 @@ import { Wallet, SignOut } from "@phosphor-icons/react";
 import { useWallet, type Role } from "@/lib/wallet";
 import { shortHash } from "@/lib/format";
 import { cn } from "@/lib/cn";
+import { SealMark } from "@/components/seal-mark";
 
 const ROLE_LABEL: Record<Role, string> = {
   issuer: "Issuer",
@@ -22,8 +23,11 @@ export function WalletBar({
 
   return (
     <nav className="flex items-center justify-between py-6">
-      <button onClick={onHome} className="font-display text-lg tracking-tight hover:text-brass">
-        Attestar
+      <button onClick={onHome} className="group flex items-center gap-2.5">
+        <SealMark size={22} className="text-brass" />
+        <span className="font-display text-lg tracking-tight transition group-hover:text-brass">
+          Attestar
+        </span>
       </button>
       <div className="flex items-center gap-4">
         {role && (
