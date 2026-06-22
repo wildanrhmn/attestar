@@ -3,7 +3,7 @@ const nextConfig = {
   serverExternalPackages: [
     "@attestar/sdk",
     "attestar-client",
-    "mock-token-client",
+    "usdc-client",
     "@stellar/stellar-sdk",
   ],
   webpack: (config, { isServer }) => {

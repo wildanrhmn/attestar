@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3100",
-    "build": "pnpm --filter @attestar/sdk --filter attestar-client --filter mock-token-client build && next build",
+    "build": "pnpm --filter @attestar/sdk --filter attestar-client --filter usdc-client build && next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -15,7 +15,7 @@
     "@stellar/stellar-sdk": "^14.5.0",
     "attestar-client": "workspace:*",
     "clsx": "^2.1.1",
-    "mock-token-client": "workspace:*",
+    "usdc-client": "workspace:*",
     "next": "^15.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

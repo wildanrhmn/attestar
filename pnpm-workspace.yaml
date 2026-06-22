@@ -2,5 +2,5 @@ packages:
   - packages/circuits
   - packages/sdk
   - packages/attestar-client
-  - packages/mock-token-client
+  - packages/usdc-client
   - apps/web

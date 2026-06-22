@@ -3,7 +3,7 @@ import * as snarkjs from "snarkjs";
 import { Keypair } from "@stellar/stellar-sdk";
 import { basicNodeSigner } from "@stellar/stellar-sdk/contract";
 import { Client as Attestar } from "attestar-client";
-import { Client as Token } from "mock-token-client";
+import { Client as Token } from "usdc-client";
 import {
   MerkleSumTree,
   buildCircuitInput,

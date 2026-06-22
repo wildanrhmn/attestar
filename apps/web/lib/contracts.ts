@@ -1,7 +1,7 @@
 "use client";
 
 import { Client as Attestar } from "attestar-client";
-import { Client as Token } from "mock-token-client";
+import { Client as Token } from "usdc-client";
 
 import { ATTESTAR_ID, TOKEN_ID, RPC_URL, NETWORK_PASSPHRASE, RESERVE_HOLDER } from "@/lib/config";
 

@@ -188,7 +188,7 @@ attestar/
 │  │                     (kept byte-identical to the circuit)
 │  ├─ contracts/         Soroban (Rust): Attestar verifier + attestation registry, 10 tests
 │  ├─ attestar-client/   Generated TS bindings for the Attestar contract
-│  └─ mock-token-client/ Generated TS bindings for the USDC token (SAC) interface
+│  └─ usdc-client/       Generated TS bindings for the USDC token (SAC) interface
 ├─ apps/
 │  └─ web/               Next.js 15 app: role picker, issuer/holder/regulator views,
 │                        client-side proving, Freighter signing, selective disclosure
@@ -226,7 +226,7 @@ Run the web app against the live testnet deployment:
 ```bash
 pnpm install
 pnpm --filter @attestar/sdk build
-pnpm --filter attestar-client --filter mock-token-client build
+pnpm --filter attestar-client --filter usdc-client build
 pnpm web:dev        # http://localhost:3100
 ```
 
