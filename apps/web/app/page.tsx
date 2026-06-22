@@ -7,9 +7,8 @@ import { IssuerView } from "@/components/issuer-view";
 import { HolderView } from "@/components/holder-view";
 import { RegulatorView } from "@/components/regulator-view";
 import { explorerContract } from "@/lib/format";
+import { ATTESTAR_ID } from "@/lib/config";
 import type { Role } from "@/lib/wallet";
-
-const ATTESTAR_ID = process.env.NEXT_PUBLIC_ATTESTAR_ID ?? "";
 
 export default function Home() {
   const [role, setRole] = useState<Role | null>(null);

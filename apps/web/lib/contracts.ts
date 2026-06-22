@@ -3,12 +3,11 @@
 import { Client as Attestar } from "attestar-client";
 import { Client as Token } from "mock-token-client";
 
-const PASS =
-  process.env.NEXT_PUBLIC_NETWORK_PASSPHRASE ?? "Test SDF Network ; September 2015";
-const RPC = process.env.NEXT_PUBLIC_RPC_URL ?? "https://soroban-testnet.stellar.org";
-const ATTESTAR_ID = process.env.NEXT_PUBLIC_ATTESTAR_ID!;
-const TOKEN_ID = process.env.NEXT_PUBLIC_TOKEN_ID!;
-const READER = process.env.NEXT_PUBLIC_RESERVE_HOLDER ?? "";
+import { ATTESTAR_ID, TOKEN_ID, RPC_URL, NETWORK_PASSPHRASE, RESERVE_HOLDER } from "@/lib/config";
+
+const PASS = NETWORK_PASSPHRASE;
+const RPC = RPC_URL;
+const READER = RESERVE_HOLDER;
 
 type Signer = (
   xdr: string,

@@ -32,6 +32,7 @@ import { Panel, Eyebrow, Stat } from "@/components/panel";
 import { SolvencySeal } from "@/components/solvency-seal";
 import { baseToUsdc, usdcToBase, shortHash, explorerTx } from "@/lib/format";
 import { cn } from "@/lib/cn";
+import { ATTESTAR_ID, RESERVE_HOLDER, SINK_ADDRESS as SINK } from "@/lib/config";
 
 type Status = "solvent" | "insolvent" | "none";
 
@@ -42,9 +43,6 @@ const STAGE_LABEL: Record<ProveStage, string> = {
   done: "Proof ready",
 };
 
-const ATTESTAR_ID = process.env.NEXT_PUBLIC_ATTESTAR_ID!;
-const RESERVE_HOLDER = process.env.NEXT_PUBLIC_RESERVE_HOLDER!;
-const SINK = process.env.NEXT_PUBLIC_SINK_ADDRESS!;
 const VERIFIER_FLAG = `attestar:verifier:${ATTESTAR_ID}`;
 
 export function IssuerView() {
