@@ -23,3 +23,11 @@ export interface CircuitInput {
   balances: string[];
   userIds: string[];
 }
+
+export interface PrivateCircuitInput {
+  balances: string[];
+  userIds: string[];
+  reserves: string[];
+  sourceIds: string[];
+  onchainReserves: string;
+}

@@ -1,5 +1,5 @@
 export { MerkleSumTree } from "./merkleSumTree.js";
-export { buildCircuitInput } from "./witness.js";
+export { buildCircuitInput, buildPrivateInput } from "./witness.js";
 export { poseidon, getPoseidon } from "./poseidon.js";
 export {
   fieldToBytes,
@@ -10,4 +10,10 @@ export {
   toHex,
 } from "./groth16encode.js";
 export type { EncodedProof, EncodedVerifyingKey } from "./groth16encode.js";
-export type { Holder, SumNode, InclusionProof, CircuitInput } from "./types.js";
+export type {
+  Holder,
+  SumNode,
+  InclusionProof,
+  CircuitInput,
+  PrivateCircuitInput,
+} from "./types.js";
