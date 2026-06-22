@@ -84,38 +84,26 @@ export function HolderView() {
     }
   }
 
-  const matched = address ? matchByAddress(ledger, address) : -1;
+  const who = ledger[selected]?.label ?? "this holder";
 
   return (
     <div className="flex flex-col gap-6 pb-24">
       <header className="flex flex-col gap-2 pt-4">
         <Eyebrow>Holder console</Eyebrow>
-        <h1 className="font-display text-4xl tracking-tight">Confirm your balance was counted.</h1>
+        <h1 className="font-display text-4xl tracking-tight">Confirm a holder was counted.</h1>
         <p className="max-w-2xl text-bone-dim">
-          You should not have to trust the issuer&apos;s figures. Verify your own balance is included
-          in the liabilities the proof committed to, without seeing anyone else&apos;s balance and
-          without revealing yours.
+          Here you step into a customer&apos;s shoes. A holder should not have to trust the
+          issuer&apos;s total. They verify their own balance is included in the liabilities the proof
+          committed to, seeing only their own number.
         </p>
       </header>
-
-      <Panel className="border-brass/20 px-5 py-3">
-        <p className="text-[12px] leading-relaxed text-bone-dim">
-          You are acting as a <span className="text-bone">holder</span> (a customer of the issuer),
-          not the issuer. The balance below is what the issuer <span className="text-bone">owes you</span>,
-          a liability. That is a different thing from the issuer&apos;s reserve wallet, so it will not
-          match the USDC you drained in the issuer console.
-        </p>
-      </Panel>
 
       {!address ? (
         <Panel className="flex flex-col items-center gap-4 px-6 py-12 text-center">
           <span className="flex h-12 w-12 items-center justify-center rounded-full border border-brass/30 text-brass">
             <User size={22} weight="light" />
           </span>
-          <p className="max-w-md text-bone-dim">
-            Connect your wallet. If your address is registered to a holder, we&apos;ll match it
-            automatically.
-          </p>
+          <p className="max-w-md text-bone-dim">Connect a wallet to act as a holder.</p>
           <button
             onClick={() => connect("holder")}
             disabled={connecting}
@@ -126,6 +114,15 @@ export function HolderView() {
         </Panel>
       ) : (
         <>
+          <Panel className="border-brass/20 px-5 py-3">
+            <p className="text-[12px] leading-relaxed text-bone-dim">
+              Demo note: in production a holder is matched to their own wallet automatically. Here you
+              just pick which customer to act as. The balance you see is what the issuer{" "}
+              <span className="text-bone">owes that customer</span>, a liability. It is not the USDC in
+              your wallet, that is the issuer&apos;s separate reserve.
+            </p>
+          </Panel>
+
           <Panel className="grid gap-4 px-5 py-4 sm:grid-cols-3">
             <Stat label="Latest epoch" value={published?.epoch ?? "—"} />
             <Stat
@@ -138,19 +135,12 @@ export function HolderView() {
 
           <Panel className="flex flex-col gap-4 px-5 py-5">
             <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-bone-dim">
-              <ShieldCheck size={14} className="text-brass" /> Your inclusion
+              <ShieldCheck size={14} className="text-brass" /> Verify as a holder
             </div>
-            {matched >= 0 ? (
-              <p className="text-sm text-bone-dim">
-                Matched to <span className="text-bone">{ledger[matched]?.label}</span> by your
-                address {shortHash(address, 5)}.
-              </p>
-            ) : (
-              <p className="text-sm text-bone-dim">
-                Your address isn&apos;t registered to a holder. Pick which holder you are for the demo
-                inclusion check.
-              </p>
-            )}
+            <p className="text-sm text-bone-dim">
+              Acting as <span className="text-bone">{who}</span>. Pick a different customer if you like,
+              then verify.
+            </p>
             <div className="flex flex-wrap items-center gap-2">
               {ledger.map((h, i) => (
                 <button
@@ -159,7 +149,7 @@ export function HolderView() {
                   className={cn(
                     "rounded-full border px-3 py-1 font-mono text-xs transition",
                     selected === i
-                      ? "border-brass/60 text-bone"
+                      ? "border-brass/60 bg-brass/10 text-bone"
                       : "border-line text-bone-dim hover:border-brass/40 hover:text-bone",
                   )}
                 >
@@ -169,13 +159,15 @@ export function HolderView() {
             </div>
             <button
               onClick={verify}
-              disabled={busy || !published}
+              disabled={busy}
               className="self-start rounded-xl bg-bone px-5 py-2.5 text-sm font-medium text-neutral-950 transition hover:bg-white disabled:opacity-40"
             >
-              {busy ? "Verifying…" : "Verify my inclusion"}
+              {busy ? "Verifying…" : `Verify ${who}'s inclusion`}
             </button>
             {!published && (
-              <p className="font-mono text-xs text-slate">No attestation published yet.</p>
+              <p className="font-mono text-xs text-slate">
+                No attestation published yet. Publish one from the Issuer console first.
+              </p>
             )}
           </Panel>
 
@@ -201,13 +193,16 @@ export function HolderView() {
               >
                 {result.ok && result.matchesChain ? <SealCheck size={18} /> : <Warning size={18} />}
                 {result.ok && result.matchesChain
-                  ? "Your balance is committed in the proof the chain verified."
+                  ? `${who}'s balance is committed in the proof the chain verified.`
                   : result.ok
-                    ? "Inclusion holds, but the tree does not match the on-chain root."
+                    ? "Inclusion holds locally, but the tree does not match the on-chain root. Re-publish from the Issuer console."
                     : "Inclusion check failed."}
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
-                <Stat label="What the issuer owes you · a liability (private)" value={`${baseToUsdc(result.balance)} USDC`} />
+                <Stat
+                  label={`What the issuer owes ${who} (a liability)`}
+                  value={`${baseToUsdc(result.balance)} USDC`}
+                />
                 <Stat
                   label="Root matches on-chain"
                   value={result.matchesChain ? "Yes" : "No"}
